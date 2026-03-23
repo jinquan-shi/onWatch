@@ -716,8 +716,12 @@ func run() error {
 
 	var minimaxClient *api.MiniMaxClient
 	if cfg.HasProvider("minimax") {
-		minimaxClient = api.NewMiniMaxClient(cfg.MiniMaxAPIKey, logger)
-		logger.Info("MiniMax API client configured")
+		baseURL := "https://api.minimax.io/v1/api/openplatform/coding_plan/remains"
+		if cfg.MiniMaxRegion == "cn" {
+			baseURL = "https://www.minimaxi.com/v1/api/openplatform/coding_plan/remains"
+		}
+		minimaxClient = api.NewMiniMaxClient(cfg.MiniMaxAPIKey, logger, api.WithMiniMaxBaseURL(baseURL))
+		logger.Info("MiniMax API client configured", "region", cfg.MiniMaxRegion)
 	}
 
 	// Gemini provider - env vars or auto-detect from ~/.gemini/oauth_creds.json
@@ -1638,6 +1642,7 @@ func printHelp() {
 	fmt.Println("  COPILOT_TOKEN           GitHub Copilot token (PAT with copilot scope)")
 	fmt.Println("  CODEX_TOKEN             Codex OAuth token (recommended; required for Codex-only)")
 	fmt.Println("  MINIMAX_API_KEY         MiniMax API key")
+	fmt.Println("  MINIMAX_REGION          MiniMax region: global or cn (default: global)")
 	fmt.Println("  CODEX_HOME              Optional Codex auth directory (uses CODEX_HOME/auth.json)")
 	fmt.Println("  ONWATCH_POLL_INTERVAL   Polling interval in seconds")
 	fmt.Println("  ONWATCH_PORT            Dashboard HTTP port")

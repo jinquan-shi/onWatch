@@ -45,7 +45,8 @@ type Config struct {
 	AntigravityEnabled   bool   // true if auto-detection should be attempted
 
 	// MiniMax provider configuration
-	MiniMaxAPIKey string // MINIMAX_API_KEY
+	MiniMaxAPIKey  string // MINIMAX_API_KEY
+	MiniMaxRegion  string // MINIMAX_REGION ( "global" | "cn", default: "global" )
 
 	// Gemini provider configuration (auto-detected from ~/.gemini/oauth_creds.json or env vars)
 	GeminiEnabled      bool   // true if auto-detected or GEMINI_ENABLED=true
@@ -248,6 +249,10 @@ func loadFromEnvAndFlags(flags *flagValues) (*Config, error) {
 
 	// MiniMax provider
 	cfg.MiniMaxAPIKey = strings.TrimSpace(os.Getenv("MINIMAX_API_KEY"))
+	cfg.MiniMaxRegion = strings.ToLower(strings.TrimSpace(os.Getenv("MINIMAX_REGION")))
+	if cfg.MiniMaxRegion == "" {
+		cfg.MiniMaxRegion = "global"
+	}
 
 	// Gemini provider (auto-detected, env vars, or opt-out via GEMINI_ENABLED=false)
 	cfg.GeminiRefreshToken = strings.TrimSpace(os.Getenv("GEMINI_REFRESH_TOKEN"))
