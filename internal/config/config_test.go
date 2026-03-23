@@ -204,6 +204,50 @@ func TestConfig_MiniMaxProvider(t *testing.T) {
 	}
 }
 
+func TestConfig_MiniMaxRegion_LoadsFromEnv(t *testing.T) {
+	os.Clearenv()
+	os.Setenv("MINIMAX_API_KEY", "sk-cp-test-key")
+	os.Setenv("MINIMAX_REGION", "cn")
+	defer os.Clearenv()
+
+	cfg, err := Load()
+	if err != nil {
+		t.Fatalf("Load() failed: %v", err)
+	}
+	if cfg.MiniMaxRegion != "cn" {
+		t.Errorf("MiniMaxRegion = %q, want %q", cfg.MiniMaxRegion, "cn")
+	}
+}
+
+func TestConfig_MiniMaxRegion_DefaultsToGlobal(t *testing.T) {
+	os.Clearenv()
+	os.Setenv("MINIMAX_API_KEY", "sk-cp-test-key")
+	defer os.Clearenv()
+
+	cfg, err := Load()
+	if err != nil {
+		t.Fatalf("Load() failed: %v", err)
+	}
+	if cfg.MiniMaxRegion != "global" {
+		t.Errorf("MiniMaxRegion = %q, want %q (default)", cfg.MiniMaxRegion, "global")
+	}
+}
+
+func TestConfig_MiniMaxRegion_NormalizesToLowercase(t *testing.T) {
+	os.Clearenv()
+	os.Setenv("MINIMAX_API_KEY", "sk-cp-test-key")
+	os.Setenv("MINIMAX_REGION", "CN")
+	defer os.Clearenv()
+
+	cfg, err := Load()
+	if err != nil {
+		t.Fatalf("Load() failed: %v", err)
+	}
+	if cfg.MiniMaxRegion != "cn" {
+		t.Errorf("MiniMaxRegion = %q, want %q (lowercase)", cfg.MiniMaxRegion, "cn")
+	}
+}
+
 func TestConfig_AllowsNoProvidersConfigured(t *testing.T) {
 	os.Clearenv()
 
